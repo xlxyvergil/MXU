@@ -224,6 +224,7 @@ export default {
         '尚未手動選擇過視窗，已自動匹配到「{{name}}」。如需更換，請在連接設定中手動選擇，下次將記住您的選擇。',
       resourceFailed: '資源載入失敗',
       startFailed: '任務啟動失敗',
+      agentStartParams: 'Agent #{{index}} 啟動參數: {{cmd}}  (工作目錄: {{cwd}})',
       needConfig: '請先連接裝置並載入資源，或在連接面板儲存裝置設定',
     },
   },

@@ -783,8 +783,27 @@ export function Toolbar({ showAddPanel, onToggleAddPanel }: ToolbarProps) {
       } catch (err) {
         log.error(`实例 ${targetInstance.name}: 任务启动异常:`, err);
 
+        const errMsg = err instanceof Error ? err.message : String(err);
+        addLog(targetId, {
+          type: 'error',
+          message: `${t('taskList.autoConnect.startFailed')}: ${errMsg}`,
+        });
+
         const failedAgentConfigs = normalizeAgentConfigs(projectInterface?.agent);
         if (failedAgentConfigs && failedAgentConfigs.length > 0) {
+          for (let i = 0; i < failedAgentConfigs.length; i++) {
+            const agentCfg = failedAgentConfigs[i];
+            const args = agentCfg.child_args?.join(' ') ?? '';
+            const cmd = args ? `${agentCfg.child_exec} ${args}` : agentCfg.child_exec;
+            addLog(targetId, {
+              type: 'warning',
+              message: t('taskList.autoConnect.agentStartParams', {
+                index: i + 1,
+                cmd,
+                cwd: basePath,
+              }),
+            });
+          }
           try {
             await maaService.stopAgent(targetId);
           } catch {

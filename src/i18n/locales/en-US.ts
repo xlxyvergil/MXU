@@ -231,6 +231,7 @@ export default {
         'No window was previously selected. Automatically matched "{{name}}". To change, select manually in Connection Settings — your choice will be remembered next time.',
       resourceFailed: 'Resource loading failed',
       startFailed: 'Failed to start tasks',
+      agentStartParams: 'Agent #{{index}} start params: {{cmd}}  (cwd: {{cwd}})',
       needConfig:
         'Please connect device and load resource first, or save device config in connection panel',
     },
