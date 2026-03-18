@@ -604,6 +604,7 @@ export default {
     dismiss: 'Skip This Version',
     noReleaseNotes: 'No release notes available',
     checkFailed: 'Failed to check for updates',
+    checkFailedHint: 'Please check your network connection and try again',
     downloading: 'Downloading',
     downloadComplete: 'Download Complete',
     downloadFailed: 'Download Failed',

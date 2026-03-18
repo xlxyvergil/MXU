@@ -605,6 +605,7 @@ export default {
     dismiss: 'このバージョンをスキップ',
     noReleaseNotes: 'リリースノートはありません',
     checkFailed: '更新の確認に失敗しました',
+    checkFailedHint: 'ネットワーク接続を確認して再試行してください',
     downloading: 'ダウンロード中',
     downloadComplete: 'ダウンロード完了',
     downloadFailed: 'ダウンロードに失敗しました',

@@ -603,6 +603,7 @@ export default {
     dismiss: '이 버전 건너뛰기',
     noReleaseNotes: '릴리스 노트가 없습니다',
     checkFailed: '업데이트 확인에 실패했습니다',
+    checkFailedHint: '네트워크 연결을 확인하고 다시 시도해 주세요',
     downloading: '다운로드 중',
     downloadComplete: '다운로드 완료',
     downloadFailed: '다운로드 실패',

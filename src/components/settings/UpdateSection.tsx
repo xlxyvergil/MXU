@@ -63,6 +63,7 @@ export function UpdateSection() {
   const [showCdk, setShowCdk] = useState(false);
   const [proxyInput, setProxyInput] = useState(proxySettings?.url || '');
   const [proxyError, setProxyError] = useState(false);
+  const [checkFailed, setCheckFailed] = useState(false);
   const [, setDebugLog] = useState<string[]>([]);
 
   const addDebugLog = useCallback((msg: string) => {
@@ -310,6 +311,7 @@ export function UpdateSection() {
       return;
     }
 
+    setCheckFailed(false);
     setUpdateCheckLoading(true);
     addDebugLog(`开始检查更新... (频道: ${mirrorChyanSettings.channel})`);
 
@@ -343,9 +345,11 @@ export function UpdateSection() {
         }
       } else {
         addDebugLog('检查更新失败');
+        setCheckFailed(true);
       }
     } catch (err) {
       addDebugLog(`检查更新出错: ${err}`);
+      setCheckFailed(true);
     } finally {
       setUpdateCheckLoading(false);
     }
@@ -524,6 +528,17 @@ export function UpdateSection() {
                 <p className="text-xs text-center text-text-muted">
                   {t('mirrorChyan.upToDate', { version: updateInfo.versionName })}
                 </p>
+              )}
+
+              {/* 网络异常导致检查失败 */}
+              {checkFailed && !updateCheckLoading && (
+                <div className="flex items-start gap-2 p-3 rounded-lg text-sm bg-error/10 text-error border border-error/30">
+                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                  <div className="space-y-1">
+                    <p>{t('mirrorChyan.checkFailed')}</p>
+                    <p className="text-xs opacity-80">{t('mirrorChyan.checkFailedHint')}</p>
+                  </div>
+                </div>
               )}
 
               {/* 有更新时显示更新内容和下载进度 */}

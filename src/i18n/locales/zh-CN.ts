@@ -591,6 +591,7 @@ export default {
     dismiss: '忽略此版本',
     noReleaseNotes: '暂无更新日志',
     checkFailed: '检查更新失败',
+    checkFailedHint: '请检查网络连接后重试',
     downloading: '下载中',
     downloadComplete: '下载完成',
     downloadFailed: '下载失败',
