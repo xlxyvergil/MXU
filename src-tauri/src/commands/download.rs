@@ -285,6 +285,8 @@ pub async fn download_file(
     tokio::spawn(async move {
         let mut last_downloaded = 0u64;
         let mut last_instant = tokio::time::Instant::now();
+        let mut smoothed_speed: f64 = 0.0;
+        const EMA_ALPHA: f64 = 0.3;
         loop {
             tokio::select! {
                 _ = &mut stop_rx => {
@@ -299,10 +301,16 @@ pub async fn download_file(
                     }
 
                     let bytes_in_interval = downloaded.saturating_sub(last_downloaded);
-                    let speed = if elapsed.as_secs_f64() > 0.0 {
-                        (bytes_in_interval as f64 / elapsed.as_secs_f64()) as u64
+                    let instant_speed = if elapsed.as_secs_f64() > 0.0 {
+                        bytes_in_interval as f64 / elapsed.as_secs_f64()
                     } else {
-                        0
+                        0.0
+                    };
+
+                    smoothed_speed = if smoothed_speed == 0.0 {
+                        instant_speed
+                    } else {
+                        EMA_ALPHA * instant_speed + (1.0 - EMA_ALPHA) * smoothed_speed
                     };
 
                     let progress = if total > 0 {
@@ -317,7 +325,7 @@ pub async fn download_file(
                             session_id,
                             downloaded_size: downloaded,
                             total_size: total,
-                            speed,
+                            speed: smoothed_speed as u64,
                             progress,
                         },
                     );
