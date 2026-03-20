@@ -360,19 +360,33 @@ export async function checkUpdate(options: CheckUpdateOptions): Promise<UpdateIn
 }
 
 /**
- * 判断是否为调试版本（不进行自动更新）
- * 调试版本定义：版本号为 "DEBUG_VERSION" 或小于 "1.0.0"
+ * 判断是否为非正式版本（不进行自动更新）
+ * 非正式版本定义：
+ * - 版本号为 "DEBUG_VERSION"
+ * - 版本号小于 "1.0.0"
+ * - 版本号包含 ci 或 alpha 预发布标签（如 v2.0.2-ci.123、v1.0.0-alpha.1）
  */
 export function isDebugVersion(version: string | undefined): boolean {
   if (!version) return false;
   if (version === 'DEBUG_VERSION') return true;
 
-  // 使用 semver.coerce 将版本号转换为标准格式（支持带/不带 v 前缀）
-  const parsed = semver.coerce(version);
-  if (!parsed) return false;
+  const normalized = version.replace(/^v/i, '');
 
-  // 检查是否小于 1.0.0
-  return semver.lt(parsed, '1.0.0');
+  // 优先尝试完整解析（保留预发布标签如 -ci.123、-alpha.1）
+  const parsed = semver.parse(normalized);
+  if (parsed) {
+    if (semver.lt(parsed, '1.0.0')) return true;
+    const NON_RELEASE_TAGS = ['ci', 'alpha', 'post'];
+    return parsed.prerelease.some(
+      (tag) => typeof tag === 'string' && NON_RELEASE_TAGS.includes(tag),
+    );
+  }
+
+  // 回退到 coerce（处理非标准版本号，会丢失预发布标签）
+  const coerced = semver.coerce(normalized);
+  if (!coerced) return false;
+
+  return semver.lt(coerced, '1.0.0');
 }
 
 /**

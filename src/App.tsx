@@ -720,7 +720,7 @@ function App() {
         if (import.meta.env.DEV) {
           log.info('MXU 开发模式，跳过自动更新检查');
         } else if (isDebugVersion(result.interface.version)) {
-          log.info(`调试版本 (${result.interface.version})，跳过自动更新检查`);
+          log.info(`非正式版本 (${result.interface.version})，跳过自动更新检查`);
         } else {
           const appState = useAppStore.getState();
           checkAndPrepareDownload({
