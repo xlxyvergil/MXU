@@ -141,7 +141,8 @@ export default {
       skipYes: '已运行时跳过启动',
       skipNo: '始终启动新实例',
       cmdLabel: '通过 cmd 启动',
-      cmdDescription: '启用时通过 cmd /c 启动程序，使其脱离当前进程树。一些游戏可能会检测进程树（仅 Windows 生效）',
+      cmdDescription:
+        '启用时通过 cmd /c 启动程序，使其脱离当前进程树。一些游戏可能会检测进程树（仅 Windows 生效）',
       cmdYes: '通过 cmd /c 启动',
       cmdNo: '直接启动子进程',
     },
@@ -291,7 +292,8 @@ export default {
     skipIfRunning: '已运行时跳过',
     skipIfRunningHint: '启用时，如果该程序已在运行则跳过执行，适用于避免重复启动游戏等场景',
     useCmd: '通过 cmd 启动',
-    useCmdHint: '启用时通过 cmd /c 启动程序，使其脱离当前进程树。一些游戏可能会检测进程树（仅 Windows 生效）',
+    useCmdHint:
+      '启用时通过 cmd /c 启动程序，使其脱离当前进程树。一些游戏可能会检测进程树（仅 Windows 生效）',
     preActionSkipped: '前置程序 {{name}} 已在运行，跳过执行',
     waitingForDevice: '正在等待设备就绪...',
     waitingForWindow: '正在等待窗口就绪...',

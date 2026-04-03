@@ -619,10 +619,7 @@ export const useAppStore = create<AppState>()(
 
     selectAllTasks: (instanceId, enabled) =>
       set((state) => {
-        const { controllerName, resourceName } = getCurrentControllerAndResource(
-          state,
-          instanceId,
-        );
+        const { controllerName, resourceName } = getCurrentControllerAndResource(state, instanceId);
 
         return {
           instances: state.instances.map((i) => {
@@ -632,9 +629,7 @@ export const useAppStore = create<AppState>()(
               selectedTasks: i.selectedTasks.map((t) => {
                 if (!enabled) return { ...t, enabled: false };
                 // 全选时不兼容的任务显式禁用
-                const taskDef = state.projectInterface?.task.find(
-                  (td) => td.name === t.taskName,
-                );
+                const taskDef = state.projectInterface?.task.find((td) => td.name === t.taskName);
                 if (!isTaskCompatible(taskDef, controllerName, resourceName)) {
                   return { ...t, enabled: false };
                 }

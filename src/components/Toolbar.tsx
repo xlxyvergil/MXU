@@ -111,7 +111,9 @@ export function Toolbar({ showAddPanel, onToggleAddPanel }: ToolbarProps) {
 
   // 检查是否有保存的设备和资源配置（用于权限检查等）
   const currentControllerName =
-    selectedController[instanceId] || instance?.controllerName || projectInterface?.controller[0]?.name;
+    selectedController[instanceId] ||
+    instance?.controllerName ||
+    projectInterface?.controller[0]?.name;
   const currentResourceName =
     selectedResource[instanceId] || instance?.resourceName || projectInterface?.resource[0]?.name;
   const currentController = projectInterface?.controller.find(

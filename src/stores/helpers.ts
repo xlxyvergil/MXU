@@ -1,9 +1,4 @@
-import type {
-  OptionValue,
-  OptionDefinition,
-  PresetOptionValue,
-  TaskItem,
-} from '@/types/interface';
+import type { OptionValue, OptionDefinition, PresetOptionValue, TaskItem } from '@/types/interface';
 import { findSwitchCase } from '@/utils/optionHelpers';
 import type { AppState } from './types';
 

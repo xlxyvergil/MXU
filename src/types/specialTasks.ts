@@ -157,7 +157,12 @@ const MXU_LAUNCH_TASK_DEF_INTERNAL: TaskItem = {
   name: MXU_LAUNCH_TASK_NAME,
   label: 'specialTask.launch.label',
   entry: MXU_LAUNCH_ENTRY,
-  option: ['__MXU_LAUNCH_OPTION__', '__MXU_LAUNCH_WAIT_OPTION__', '__MXU_LAUNCH_SKIP_OPTION__', '__MXU_LAUNCH_CMD_OPTION__'],
+  option: [
+    '__MXU_LAUNCH_OPTION__',
+    '__MXU_LAUNCH_WAIT_OPTION__',
+    '__MXU_LAUNCH_SKIP_OPTION__',
+    '__MXU_LAUNCH_CMD_OPTION__',
+  ],
   pipeline_override: {
     [MXU_LAUNCH_ENTRY]: {
       action: 'Custom',

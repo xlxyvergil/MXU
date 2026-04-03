@@ -141,7 +141,8 @@ export default {
       skipYes: '已運行時跳過啟動',
       skipNo: '始終啟動新實例',
       cmdLabel: '透過 cmd 啟動',
-      cmdDescription: '啟用時透過 cmd /c 啟動程式，使其脫離當前進程樹。一些遊戲可能會檢測進程樹（僅 Windows 生效）',
+      cmdDescription:
+        '啟用時透過 cmd /c 啟動程式，使其脫離當前進程樹。一些遊戲可能會檢測進程樹（僅 Windows 生效）',
       cmdYes: '透過 cmd /c 啟動',
       cmdNo: '直接啟動子行程',
     },
@@ -291,7 +292,8 @@ export default {
     skipIfRunning: '已運行時跳過',
     skipIfRunningHint: '啟用時，如果該程式已在運行則跳過執行，適用於避免重複啟動遊戲等場景',
     useCmd: '透過 cmd 啟動',
-    useCmdHint: '啟用時透過 cmd /c 啟動程式，使其脫離當前進程樹。一些遊戲可能會檢測進程樹（僅 Windows 生效）',
+    useCmdHint:
+      '啟用時透過 cmd /c 啟動程式，使其脫離當前進程樹。一些遊戲可能會檢測進程樹（僅 Windows 生效）',
     preActionSkipped: '前置程式 {{name}} 已在運行，跳過執行',
     waitingForDevice: '正在等待裝置就緒...',
     waitingForWindow: '正在等待視窗就緒...',
