@@ -20,7 +20,7 @@ import type { TaskConfig, ControllerConfig } from '@/types/maa';
 import { normalizeAgentConfigs } from '@/types/interface';
 import { parseWin32ScreencapMethod, parseWin32InputMethod } from '@/types/maa';
 import { SchedulePanel } from './SchedulePanel';
-import type { Instance } from '@/types/interface';
+import type { Instance, TaskItem } from '@/types/interface';
 import { resolveI18nText } from '@/services/contentResolver';
 import { getInterfaceLangKey } from '@/i18n';
 import { PermissionModal } from './toolbar/PermissionModal';
@@ -192,6 +192,63 @@ export function Toolbar({ showAddPanel, onToggleAddPanel }: ToolbarProps) {
       // 获取控制器和资源配置
       const controllerName = selectedController[targetId] || projectInterface?.controller[0]?.name;
       const resourceName = selectedResource[targetId] || projectInterface?.resource[0]?.name;
+
+      // 过滤掉不兼容当前控制器/资源的任务
+      const compatibleTasks = enabledTasks.filter((t) => {
+        const taskDef = projectInterface?.task.find((td) => td.name === t.taskName);
+        return isTaskCompatible(taskDef, controllerName, resourceName);
+      });
+
+      // 如果有任务因不兼容被跳过，记录警告
+      const compatibleTaskIds = new Set(compatibleTasks.map((t) => t.id));
+      const skippedTasks = enabledTasks.filter((t) => !compatibleTaskIds.has(t.id));
+      if (skippedTasks.length > 0) {
+        log.warn(
+          `实例 ${targetInstance.name}: ${t('taskList.tasksSkippedDueToIncompatibility', { count: skippedTasks.length })}`,
+        );
+        // 向用户显示跳过任务的警告
+        addLog(targetId, {
+          type: 'warning',
+          message: t('taskList.tasksSkippedDueToIncompatibility', { count: skippedTasks.length }),
+        });
+        skippedTasks.forEach((task) => {
+          const taskDef = projectInterface?.task.find((td) => td.name === task.taskName);
+          const taskLabel = taskDef?.label
+            ? resolveI18nText(taskDef.label, translations)
+            : task.taskName;
+
+          // 检查是控制器不兼容还是资源不兼容
+          const isControllerIncompatible =
+            taskDef?.controller &&
+            taskDef.controller.length > 0 &&
+            controllerName &&
+            !taskDef.controller.includes(controllerName);
+
+          const isResourceIncompatible =
+            taskDef?.resource &&
+            taskDef.resource.length > 0 &&
+            resourceName &&
+            !taskDef.resource.includes(resourceName);
+
+          if (isControllerIncompatible) {
+            log.warn(`  - ${t('taskList.taskSkippedController', { taskName: taskLabel })}`);
+          }
+          if (isResourceIncompatible) {
+            log.warn(`  - ${t('taskList.taskSkippedResource', { taskName: taskLabel })}`);
+          }
+        });
+      }
+
+      // 如果所有启用的任务都被过滤掉了，则无法启动
+      if (compatibleTasks.length === 0) {
+        log.warn(`实例 ${targetInstance.name}: ${t('taskList.noCompatibleTasks')}`);
+        // 向用户显示明确的错误信息
+        addLog(targetId, {
+          type: 'error',
+          message: t('taskList.noCompatibleTasks'),
+        });
+        return false;
+      }
       const controller = projectInterface?.controller.find((c) => c.name === controllerName);
       const resource = projectInterface?.resource.find((r) => r.name === resourceName);
       const savedDevice = targetInstance.savedDevice;
@@ -786,41 +843,57 @@ export function Toolbar({ showAddPanel, onToggleAddPanel }: ToolbarProps) {
 
         onPhaseChange?.('idle');
 
-        log.info(`实例 ${targetInstance.name}: 开始执行任务, 数量:`, enabledTasks.length);
-
-        // 构建任务配置列表，同时预注册 entry -> taskName 映射（解决时序问题）
-        const taskConfigs: TaskConfig[] = [];
-        for (const selectedTask of enabledTasks) {
-          // 先检查是否是 MXU 特殊任务
+        // 构建可运行任务列表（排除无法找到定义的任务）
+        // 这确保了 taskConfigs、taskIds 和 runnableTasks 的索引对齐
+        interface RunnableTask {
+          selectedTask: (typeof compatibleTasks)[0];
+          taskDef: NonNullable<ReturnType<typeof getMxuSpecialTask>>['taskDef'] | TaskItem;
+          specialTask: ReturnType<typeof getMxuSpecialTask>;
+        }
+        const runnableTasks: RunnableTask[] = [];
+        for (const selectedTask of compatibleTasks) {
           const specialTask = getMxuSpecialTask(selectedTask.taskName);
           const taskDef =
             specialTask?.taskDef ||
             projectInterface?.task.find((t) => t.name === selectedTask.taskName);
-          if (!taskDef) continue;
-          taskConfigs.push({
-            entry: taskDef.entry,
-            pipeline_override: generateTaskPipelineOverride(
-              selectedTask,
-              projectInterface,
-              controllerName,
-              resourceName,
-            ),
-          });
-          // 预注册 entry -> taskName 映射，确保回调时能找到任务名
-          // MXU 特殊任务的 label 是 MXU i18n key（如 'specialTask.sleep.label'），需要用 t() 翻译
-          const taskDisplayName =
-            selectedTask.customName ||
-            (specialTask && taskDef.label
-              ? t(taskDef.label)
-              : resolveI18nText(taskDef.label, translations)) ||
-            selectedTask.taskName;
-          registerEntryTaskName(taskDef.entry, taskDisplayName);
+          if (!taskDef) {
+            log.warn(`跳过任务 ${selectedTask.taskName}: 未找到任务定义`);
+            continue;
+          }
+          runnableTasks.push({ selectedTask, taskDef, specialTask });
         }
 
-        if (taskConfigs.length === 0) {
+        if (runnableTasks.length === 0) {
           log.warn(`实例 ${targetInstance.name}: 没有可执行的任务`);
           return false;
         }
+
+        log.info(`实例 ${targetInstance.name}: 开始执行任务, 数量:`, runnableTasks.length);
+
+        // 构建任务配置列表，同时预注册 entry -> taskName 映射（解决时序问题）
+        const taskConfigs: TaskConfig[] = runnableTasks.map(
+          ({ selectedTask, taskDef, specialTask }) => {
+            // 预注册 entry -> taskName 映射，确保回调时能找到任务名
+            // MXU 特殊任务的 label 是 MXU i18n key（如 'specialTask.sleep.label'），需要用 t() 翻译
+            const taskDisplayName =
+              selectedTask.customName ||
+              (specialTask && taskDef.label
+                ? t(taskDef.label)
+                : resolveI18nText(taskDef.label, translations)) ||
+              selectedTask.taskName;
+            registerEntryTaskName(taskDef.entry, taskDisplayName);
+
+            return {
+              entry: taskDef.entry,
+              pipeline_override: generateTaskPipelineOverride(
+                selectedTask,
+                projectInterface,
+                controllerName,
+                resourceName,
+              ),
+            };
+          },
+        );
 
         // 准备 Agent 配置（支持单个或多个 Agent）
         const agentConfigs = normalizeAgentConfigs(projectInterface?.agent);
@@ -864,29 +937,27 @@ export function Toolbar({ showAddPanel, onToggleAddPanel }: ToolbarProps) {
 
         log.info(`实例 ${targetInstance.name}: 任务已提交, task_ids:`, taskIds);
 
-        // 初始化任务运行状态
-        const enabledTaskIds = enabledTasks.map((t) => t.id);
-        setAllTasksRunStatus(targetId, enabledTaskIds, 'pending');
+        // 初始化任务运行状态（使用 runnableTasks 确保索引对齐）
+        const runnableTaskIds = runnableTasks.map((rt) => rt.selectedTask.id);
+        setAllTasksRunStatus(targetId, runnableTaskIds, 'pending');
 
         // 开始任务时折叠所有任务
         collapseAllTasks(targetId, false);
 
         // 记录映射关系，并注册 task_id 与任务名的映射用于日志显示
         taskIds.forEach((maaTaskId, index) => {
-          if (enabledTasks[index]) {
-            registerMaaTaskMapping(targetId, maaTaskId, enabledTasks[index].id);
+          const runnable = runnableTasks[index];
+          if (runnable) {
+            const { selectedTask, taskDef, specialTask } = runnable;
+            registerMaaTaskMapping(targetId, maaTaskId, selectedTask.id);
             // 注册 task_id 与任务名的映射（使用自定义名称或 label）
             // MXU 特殊任务的 label 需要用 t() 翻译
-            const specialTask = getMxuSpecialTask(enabledTasks[index].taskName);
-            const taskDef =
-              specialTask?.taskDef ||
-              projectInterface?.task.find((t) => t.name === enabledTasks[index].taskName);
             const taskDisplayName =
-              enabledTasks[index].customName ||
-              (specialTask && taskDef?.label
+              selectedTask.customName ||
+              (specialTask && taskDef.label
                 ? t(taskDef.label)
-                : resolveI18nText(taskDef?.label, translations)) ||
-              enabledTasks[index].taskName;
+                : resolveI18nText(taskDef.label, translations)) ||
+              selectedTask.taskName;
             registerTaskIdName(maaTaskId, taskDisplayName);
           }
         });
