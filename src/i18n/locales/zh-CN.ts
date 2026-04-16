@@ -333,7 +333,8 @@ export default {
     importSuccess: '配置导入成功',
     importFailed: '导入失败：格式无效',
     importProjectMismatch: '导入失败：项目不匹配',
-    importVersionUnsupported: '导入失败：不支持的版本',
+    importVersionUnsupported:
+      '导入失败：该配置由更高版本的 {{projectName}} 导出，请更新 {{projectName}} 后重试',
     exportSuccess: '配置已复制到剪贴板',
     exportFailed: '导出失败：无法写入剪贴板',
     exportShareHint: '「{{tabName}}」的 {{projectName}} 配置，发给你啦~',

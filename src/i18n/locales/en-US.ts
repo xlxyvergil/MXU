@@ -341,7 +341,8 @@ export default {
     importSuccess: 'Config imported successfully',
     importFailed: 'Import failed: invalid format',
     importProjectMismatch: 'Import failed: project mismatch',
-    importVersionUnsupported: 'Import failed: unsupported version',
+    importVersionUnsupported:
+      'Import failed: this config was exported by a newer version of {{projectName}}, please update {{projectName}} and try again',
     exportSuccess: 'Config copied to clipboard',
     exportFailed: 'Export failed: unable to write to clipboard',
     exportShareHint: 'Sharing my {{projectName}} config "{{tabName}}" with you~',

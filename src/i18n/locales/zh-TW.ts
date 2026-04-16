@@ -329,7 +329,8 @@ export default {
     importSuccess: '設定匯入成功',
     importFailed: '匯入失敗：格式無效',
     importProjectMismatch: '匯入失敗：專案不匹配',
-    importVersionUnsupported: '匯入失敗：不支援的版本',
+    importVersionUnsupported:
+      '匯入失敗：該設定由更高版本的 {{projectName}} 匯出，請更新 {{projectName}} 後重試',
     exportSuccess: '設定已複製到剪貼簿',
     exportFailed: '匯出失敗：無法寫入剪貼簿',
     exportShareHint: '「{{tabName}}」的 {{projectName}} 設定，分享給你囉~',

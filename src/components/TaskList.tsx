@@ -136,7 +136,7 @@ function ImportConfigButton({ instanceId }: { instanceId: string }) {
       if (errorType === 'project_mismatch') {
         toast.error(t('preset.importProjectMismatch'));
       } else if (errorType === 'unsupported_version') {
-        toast.error(t('preset.importVersionUnsupported'));
+        toast.error(t('preset.importVersionUnsupported', { projectName }));
       } else {
         toast.error(t('preset.importFailed'));
       }

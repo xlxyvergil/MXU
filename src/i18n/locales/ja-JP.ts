@@ -335,7 +335,8 @@ export default {
     importSuccess: '設定のインポートに成功しました',
     importFailed: 'インポート失敗：無効な形式',
     importProjectMismatch: 'インポート失敗：プロジェクトが一致しません',
-    importVersionUnsupported: 'インポート失敗：サポートされていないバージョン',
+    importVersionUnsupported:
+      'インポート失敗：この設定はより新しいバージョンの{{projectName}}でエクスポートされました。{{projectName}}を更新してから再試行してください',
     exportSuccess: '設定をクリップボードにコピーしました',
     exportFailed: 'エクスポート失敗：クリップボードに書き込めません',
     exportShareHint: '{{projectName}} の「{{tabName}}」設定をシェアするよ～',

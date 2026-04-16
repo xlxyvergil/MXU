@@ -333,7 +333,8 @@ export default {
     importSuccess: '설정 가져오기 성공',
     importFailed: '가져오기 실패: 잘못된 형식',
     importProjectMismatch: '가져오기 실패: 프로젝트 불일치',
-    importVersionUnsupported: '가져오기 실패: 지원되지 않는 버전',
+    importVersionUnsupported:
+      '가져오기 실패: 이 설정은 더 새로운 버전의 {{projectName}}에서 내보낸 것입니다. {{projectName}}를 업데이트한 후 다시 시도해 주세요',
     exportSuccess: '설정이 클립보드에 복사되었습니다',
     exportFailed: '내보내기 실패: 클립보드에 쓸 수 없습니다',
     exportShareHint: '{{projectName}} 의 「{{tabName}}」 설정 공유해요~',
