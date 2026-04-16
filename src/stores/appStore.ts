@@ -1367,21 +1367,27 @@ export const useAppStore = create<AppState>()(
         instances: state.instances.map((i) => (i.id === instanceId ? { ...i, savedDevice } : i)),
       })),
 
-    addPreAction: (instanceId: string, action: ActionConfig, dedup?: { field: 'program'; value: string }) => {
+    addPreAction: (
+      instanceId: string,
+      action: ActionConfig,
+      dedup?: { field: 'program'; value: string },
+    ) => {
       let added = true;
       set((state) => {
         if (dedup) {
           const inst = state.instances.find((i) => i.id === instanceId);
-          if (inst?.preActions?.some((a) => a[dedup.field].toLowerCase() === dedup.value.toLowerCase())) {
+          if (
+            inst?.preActions?.some(
+              (a) => a[dedup.field].toLowerCase() === dedup.value.toLowerCase(),
+            )
+          ) {
             added = false;
             return state;
           }
         }
         return {
           instances: state.instances.map((i) =>
-            i.id === instanceId
-              ? { ...i, preActions: [...(i.preActions || []), action] }
-              : i,
+            i.id === instanceId ? { ...i, preActions: [...(i.preActions || []), action] } : i,
           ),
         };
       });
