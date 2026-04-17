@@ -31,8 +31,6 @@ export function ScanSelectOptionWrapper({
   incompatibleReason,
   translations,
 }: ScanSelectOptionWrapperProps) {
-  const { t } = useTranslation();
-
   // 解析标签和描述
   const optionLabel = optionDef.label || optionKey;
   const optionDescription = optionDef.description;
