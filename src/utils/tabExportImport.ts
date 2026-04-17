@@ -26,7 +26,8 @@ type WireOptionValue =
   | { t: 's'; c: string } // select:   caseName
   | { t: 'cb'; c: string[] } // checkbox: caseNames
   | { t: 'sw'; v: boolean } // switch:   value
-  | { t: 'in'; v: Record<string, string> }; // input: values
+  | { t: 'in'; v: Record<string, string> } // input: values
+  | { t: 'ss'; c: string }; // scan_select: caseName
 
 interface WireTask {
   i: string; // id
@@ -66,6 +67,8 @@ function encodeOptionValue(v: OptionValue): WireOptionValue {
       return { t: 'sw', v: v.value };
     case 'input':
       return { t: 'in', v: v.values };
+    case 'scan_select':
+      return { t: 'ss', c: v.caseName };
   }
 }
 
@@ -118,6 +121,8 @@ function decodeOptionValue(w: WireOptionValue): OptionValue {
       return { type: 'switch', value: w.v };
     case 'in':
       return { type: 'input', values: w.v };
+    case 'ss':
+      return { type: 'scan_select', caseName: w.c };
     default:
       throw new Error('invalid_format');
   }

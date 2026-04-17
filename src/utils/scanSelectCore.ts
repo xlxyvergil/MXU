@@ -1,5 +1,3 @@
-import type { ScanSelectOption } from '@/types/scanSelect';
-
 /**
  * 处理 scan_select 的 pipeline_override，替换占位符为选中值
  * @param pipelineOverride 原始 pipeline_override 对象
