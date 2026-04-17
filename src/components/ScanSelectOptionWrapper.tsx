@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import type { ScanSelectOption } from '@/types/scanSelect';
 import type { OptionValue } from '@/types/interface';
 import { ScanSelectOptionComponent as CoreScanSelectComponent } from './ScanSelectOption';

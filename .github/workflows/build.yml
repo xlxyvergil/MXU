@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*"
+    branches:
+      - "**"
     paths:
       - ".github/workflows/build.yml"
       - "src/**"
