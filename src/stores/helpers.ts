@@ -26,6 +26,11 @@ export const createDefaultOptionValue = (optionDef: OptionDefinition): OptionVal
     return { type: 'checkbox', caseNames: [...defaultCases] };
   }
 
+  if (optionDef.type === 'scan_select') {
+    const defaultCase = optionDef.default_case || optionDef.cases[0]?.name || '';
+    return { type: 'scan_select', caseName: defaultCase };
+  }
+
   // select type (default)
   const defaultCase = optionDef.default_case || optionDef.cases[0]?.name || '';
   return { type: 'select', caseName: defaultCase };

@@ -14,6 +14,7 @@ import { isMxuSpecialTask, getMxuSpecialTask } from '@/types/specialTasks';
 import { loggers } from './logger';
 import { findSwitchCase } from './optionHelpers';
 import { createDefaultOptionValue } from '@/stores/helpers';
+import * as ScanSelectCore from './scanSelectCore';
 
 /**
  * 检查选项是否与当前控制器/资源不兼容
@@ -155,6 +156,8 @@ const collectOptionOverrides = (
         overrideStr,
       });
     }
+  } else if (optionValue.type === 'scan_select' && 'pipeline_override' in optionDef) {
+    overrides.push(ScanSelectCore.processScanSelectPipeline(optionDef.pipeline_override as Record<string, unknown>, optionKey, optionValue.caseName));
   }
 };
 

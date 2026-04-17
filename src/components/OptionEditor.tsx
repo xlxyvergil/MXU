@@ -10,6 +10,7 @@ import { getInterfaceLangKey } from '@/i18n';
 import { findSwitchCase } from '@/utils/optionHelpers';
 import { SwitchButton, TextInput, FileInput, TimeInput } from './FormControls';
 import { Tooltip } from './ui/Tooltip';
+import { ScanSelectOptionComponent } from './ScanSelectOption';
 
 /** 判断 switch 类型的选项是否有子选项 */
 export function switchHasNestedOptions(optionDef: OptionDefinition): boolean {
@@ -539,6 +540,48 @@ export function OptionEditor({
               </button>
             );
           })}
+        </div>
+      </div>
+    );
+  }
+
+  // scan_select 类型（带刷新按钮的下拉框）
+  if (optionDef.type === 'scan_select') {
+    return (
+      <div
+        className={clsx(
+          'space-y-3',
+          depth > 0 && 'ml-4 pl-3 border-l-2 border-border',
+          isOptionIncompatible && 'opacity-60',
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1 max-w-[60%]">
+            <OptionLabelWithIncompatible
+              label={optionLabel}
+              icon={optionDef.icon}
+              basePath={basePath}
+              incompatibleReason={incompatibleReason}
+            />
+            <OptionDescription
+              description={optionDescription}
+              basePath={basePath}
+              translations={translations}
+            />
+          </div>
+          <ScanSelectOptionComponent
+            optionDef={optionDef as any}
+            value={value as any}
+            onChange={(caseName) => {
+              if (effectiveDisabled) return;
+              setTaskOptionValue(instanceId, taskId, optionKey, {
+                type: 'scan_select',
+                caseName,
+              });
+            }}
+            basePath={basePath}
+            disabled={effectiveDisabled}
+          />
         </div>
       </div>
     );
