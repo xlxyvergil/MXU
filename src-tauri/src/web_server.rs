@@ -18,7 +18,9 @@ use axum::{
 };
 #[cfg(not(debug_assertions))]
 use rust_embed::RustEmbed;
-use tower_http::cors::{Any, CorsLayer};
+#[cfg(debug_assertions)]
+use tower_http::cors::Any;
+use tower_http::cors::CorsLayer;
 
 use crate::commands::{
     app_config::AppConfigState,
@@ -272,6 +274,8 @@ pub async fn start_web_server(
         )
         // 本地文件代理（浏览器通过此端点访问 exe 目录下的资源文件）
         .route("/local-file", get(handle_serve_local_file))
+        // 扫描目录（scan_select 功能）
+        .route("/scan/directory", get(handle_scan_directory))
         .with_state(state);
 
     // 主路由：API + 静态前端页面
@@ -1266,5 +1270,26 @@ async fn handle_restart_as_admin(State(state): State<WebState>) -> impl IntoResp
             Json(serde_json::json!({ "error": e })),
         )
             .into_response(),
+    }
+}
+
+/// GET /api/scan/directory?path=xxx&filter=xxx
+/// 扫描目录并返回文件列表（用于 scan_select 功能）
+async fn handle_scan_directory(
+    axum::extract::Query(params): axum::extract::Query<std::collections::HashMap<String, String>>,
+) -> impl IntoResponse {
+    let scan_dir = match params.get("path") {
+        Some(p) if !p.is_empty() => p.as_str(),
+        _ => return (StatusCode::BAD_REQUEST, Json(serde_json::json!({ "error": "缺少 path 参数" }))).into_response(),
+    };
+    
+    let scan_filter = params.get("filter").cloned().unwrap_or_else(|| "*".to_string());
+    
+    match crate::commands::file_ops::scan_directory(scan_dir.to_string(), scan_filter) {
+        Ok(files) => Json(serde_json::json!({ "files": files })).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({ "error": e })),
+        ).into_response(),
     }
 }

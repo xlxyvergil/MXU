@@ -3,10 +3,23 @@ import { useTranslation } from 'react-i18next';
 import type { ScanSelectOption } from '@/types/scanSelect';
 import { RefreshCw } from 'lucide-react';
 import clsx from 'clsx';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke, isTauri } from '@tauri-apps/api/core';
 
 async function scanDirectory(scanDir: string, scanFilter: string): Promise<string[]> {
-  return invoke<string[]>('scan_directory', { scanDir, scanFilter });
+  if (isTauri()) {
+    // Tauri 模式：直接调用 Rust 命令
+    return invoke<string[]>('scan_directory', { scanDir, scanFilter });
+  } else {
+    // WebUI 模式：通过 HTTP API 调用
+    const port = window.location.port || '12701';
+    const url = `http://${window.location.hostname}:${port}/api/scan/directory?path=${encodeURIComponent(scanDir)}&filter=${encodeURIComponent(scanFilter)}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`扫描失败: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.files || [];
+  }
 }
 
 interface ScanSelectOptionProps {
