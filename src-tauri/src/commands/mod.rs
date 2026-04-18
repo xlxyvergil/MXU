@@ -22,6 +22,7 @@ pub mod download;
 pub mod file_ops;
 pub mod maa_agent;
 pub mod maa_core;
+pub mod scan;
 pub mod state;
 pub mod system;
 pub mod tray;
@@ -38,3 +39,4 @@ pub use utils::get_maafw_dir;
 // 重新导出 Tauri 命令（供 lib.rs 直接调用的函数）
 pub use file_ops::get_data_dir;
 pub use file_ops::get_exe_dir;
+pub use scan::scan_directory;

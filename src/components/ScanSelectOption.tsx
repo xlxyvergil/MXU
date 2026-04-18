@@ -3,12 +3,10 @@ import { useTranslation } from 'react-i18next';
 import type { ScanSelectOption } from '@/types/scanSelect';
 import { RefreshCw } from 'lucide-react';
 import clsx from 'clsx';
+import { invoke } from '@tauri-apps/api/core';
 
-// TODO: 后续需要实现 Tauri command 来扫描目录
 async function scanDirectory(scanDir: string, scanFilter: string): Promise<string[]> {
-  // 临时实现：返回空数组，等待后端实现
-  console.log('Scan directory:', scanDir, 'Filter:', scanFilter);
-  return [];
+  return invoke<string[]>('scan_directory', { scanDir, scanFilter });
 }
 
 interface ScanSelectOptionProps {
