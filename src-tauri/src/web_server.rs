@@ -1285,7 +1285,7 @@ async fn handle_scan_directory(
     
     let scan_filter = params.get("filter").cloned().unwrap_or_else(|| "*".to_string());
     
-    match crate::commands::file_ops::scan_directory(scan_dir.to_string(), scan_filter) {
+    match crate::commands::scan::scan_directory(scan_dir.to_string(), scan_filter) {
         Ok(files) => Json(serde_json::json!({ "files": files })).into_response(),
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
